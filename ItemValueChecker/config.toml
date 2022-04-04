@@ -1,0 +1,11 @@
+
+[general]
+
+	[general.updates]
+		"&6update_messages_(in_progress)" = true
+
+[tooltip]
+
+	[tooltip.general]
+		"add_item_value_to_tooltip_(in_progress)" = false
+

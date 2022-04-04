@@ -15,6 +15,11 @@ function c(message) { ChatLib.chat(message) }
 
 function s(message) { ChatLib.say(message) }
 
+let lowestBinData = {}
+let bazaarData = {}
+let enchantsData = {}
+let masterStarData = {"1": "FIRST_MASTER_STAR", "2": "SECOND_MASTER_STAR", "3": "THIRD_MASTER_STAR", "4": "FOURTH_MASTER_STAR", "5": "FIFTH_MASTER_STAR"}
+
 // Switch to my own API when possible
 function fetchLowestBin() {
 	request(`https://moulberry.codes/lowestbin.json`).then((data1) => {
@@ -48,6 +53,7 @@ register("guiKey", (key, gui, event) => {
   	if (String(event).includes('net.minecraft.client.gui.inventory') && !String(event).includes('net.minecraft.client.gui.inventory.GuiEditSign') && Keyboard.isKeyDown(itemValueBind.getKeyCode()) === true) {
 		if (Client.currentGui.get().getSlotUnderMouse()) {
 			let item = Player.getOpenedInventory().getStackInSlot(Client.currentGui.get().getSlotUnderMouse().field_75222_d)
+			if (!item) return
 			itemValueChecker(item)
 		}
 	}
@@ -163,7 +169,7 @@ function itemValueChecker(item) {
 
 	if (extraAttributes.getString("power_ability_scroll")) {
 		let powerScrollValue = Number(lowestBinData[extraAttributes.getString("power_ability_scroll")])
-		itemvalue += powerScrollValue
+		itemValue += powerScrollValue
 		c(`&ePower Scroll Value: ${numberWithCommas(Math.round(powerScrollValue))}`)
 	}
 

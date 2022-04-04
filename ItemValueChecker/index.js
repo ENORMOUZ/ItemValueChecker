@@ -29,7 +29,7 @@ function fetchBazaar() {
 }
 
 function fetchEnchants() {
-	request('https://raw.githubusercontent.com/ENORMOUZ/ENORMOUZ-Utils/main/constants/maxenchants.json').then((data1) => {
+	request('https://raw.githubusercontent.com/ENORMOUZ/ItemValueChecker/main/ItemValueChecker/constants/maxenchants.json').then((data1) => {
 		enchantsData = JSON.parse(data1)
 	})
 }

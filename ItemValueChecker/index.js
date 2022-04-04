@@ -87,6 +87,7 @@ function itemValueChecker(item) {
 	c(`Name: ${ChatLib.removeFormatting(item.getName())}, Id: ${itemId}`)
 	let itemValue = lowestBinData[`${itemId}`]
 	let enchantsValue = 0
+	let gemsValue = 0
 
 	if (itemId.equals("PET")) {
 		let petInfo = extraAttributes.getString(["petInfo"])
@@ -106,31 +107,30 @@ function itemValueChecker(item) {
 	else {
 		c(`Item Value: ${numberWithCommas(Math.round(itemValue))}`)
 	}
-
-	for (let number of Array.from(Array(extraAttributes.getInteger("rarity_upgrades")).keys())) {
+	for (i = 0; i < extraAttributes.getInteger("rarity_upgrades"); i++) {
 		itemValue += Number(bazaarData["products"]["RECOMBOBULATOR_3000"]["buy_summary"][0]["pricePerUnit"])
 		c(`&eRecombed: ${numberWithCommas(Math.round(bazaarData["products"]["RECOMBOBULATOR_3000"]["buy_summary"][0]["pricePerUnit"]))}`)
 	}
-	for (let number of Array.from(Array(extraAttributes.getInteger("art_of_war_count")).keys())) {
+	for (i = 0; i < extraAttributes.getInteger("art_of_war_count"); i++) {
 		itemValue += Number(lowestBinData['THE_ART_OF_WAR'])
 		c(`&eArt of war'ed: ${numberWithCommas(Math.round(lowestBinData['THE_ART_OF_WAR']))}`)
 	}
 	if (extraAttributes.getInteger("hot_potato_count") > 0 && extraAttributes.getInteger("hot_potato_count") <= 10) {
-		for (let number of Array.from(Array(extraAttributes.getInteger("hot_potato_count")).keys())) {
+		for (i = 0; i < extraAttributes.getInteger("hot_potato_count"); i++) {
 			itemValue += Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
 		}
 		c(`&eHpb'ed x ${extraAttributes.getInteger("hot_potato_count")}: ${numberWithCommas(Math.round((bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * extraAttributes.getInteger("hot_potato_count")))}`)
 	}
 	else if (extraAttributes.getInteger("hot_potato_count") > 10) {
-		for (let number of Array.from(Array(10).keys())) {
+		for (i = 0; i < 10; i++) {
 			itemValue += Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
 		}
-		for (let number of Array.from(Array(extraAttributes.getInteger("hot_potato_count") - 10).keys())) {
+		for (i = 0; i < (extraAttributes.getInteger("hot_potato_count") - 10); i++) {
 			itemValue += Number(bazaarData["products"]["FUMING_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
 		}
 		c(`&eHpb'ed and Fuming'ed x ${extraAttributes.getInteger("hot_potato_count")}: ${numberWithCommas(Math.round((Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * 10) + (Number(bazaarData["products"]["FUMING_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * (extraAttributes.getInteger("hot_potato_count") - 10))))}`)
 	}
-	for (let number of Array.from(Array(extraAttributes.getInteger("ethermerge")).keys())) {
+	for (i = 0; i < extraAttributes.getInteger("ethermerge"); i++) {
 		itemValue += Number(lowestBinData["ETHERWARP_CONDUIT"])
 		c(`&eEtherwarp'ed: ${numberWithCommas(Math.round(lowestBinData["ETHERWARP_CONDUIT"]))}`)
 	}
@@ -138,23 +138,22 @@ function itemValueChecker(item) {
 	for (let enchant of extraAttributes.getCompoundTag("enchantments").getKeySet()) {
 		if (enchant in enchantsData['NORMAL']) {
 			if (enchantsData['NORMAL'][enchant]['calculate'] === "true") {
-				itemValue += Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
-				enchantsValue = enchantsValue + Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+				enchantsValue += Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
 			}
 			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['goodLevel'])) {
-				itemValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['goodLevel']}`])
-				enchantsValue = enchantsValue + Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['goodLevel']}`])
+				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['goodLevel']}`])
 			}
 			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['maxLevel'])) {
-				itemValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['maxLevel']}`])
-				enchantsValue = enchantsValue + Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['maxLevel']}`])
+				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['maxLevel']}`])
 			}
 		} else if (enchant in enchantsData['ULTIMATE']) {
-			itemValue += Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
-			enchantsValue = enchantsValue + Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+			enchantsValue += Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
 		}
 	}
-	if (enchantsValue > 0) {c(`&eEnchants: ${numberWithCommas(Math.round(enchantsValue))}`)}
+	if (enchantsValue > 0) {
+		itemValue += enchantsValue
+		c(`&eEnchants: ${numberWithCommas(Math.round(enchantsValue))}`)
+	}
 
 	if (Number(extraAttributes.getInteger('dungeon_item_level')) > 5) {
 		let masterStarCount = Number(extraAttributes.getInteger('dungeon_item_level')) - 5
@@ -165,6 +164,23 @@ function itemValueChecker(item) {
 			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
 		}
 		c(`&eMaster Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
+	}
+
+	for (let gem of extraAttributes.getCompoundTag("gems").getKeySet()) {
+		if (!gem.endsWith("_gem") && gem != "unlocked_slots") {
+			if (!extraAttributes.getCompoundTag("gems").getString(`${gem}_gem`)) {
+				part_2 = gem.substring(0, gem.lastIndexOf("_"))
+			}
+			else {
+				part_2 = extraAttributes.getCompoundTag("gems").getString(`${gem}_gem`)
+			}
+			gemsValue += Number(bazaarData["products"][`${extraAttributes.getCompoundTag("gems").getString(gem).toUpperCase()}_${part_2.toUpperCase()}_GEM`]["buy_summary"][0]["pricePerUnit"])
+		}
+	}
+
+	if (gemsValue > 0) {
+		itemValue += gemsValue
+		c(`&eGemstones: ${numberWithCommas(Math.round(gemsValue))}`)
 	}
 
 	if (extraAttributes.getString("power_ability_scroll")) {
@@ -198,6 +214,24 @@ function itemValueChecker(item) {
 		let talismanEnrichmentValue = Number(lowestBinData[`TALISMAN_ENRICHMENT_${extraAttributes.getString("talisman_enrichment")}`])
 		itemValue += talismanEnrichmentValue
 		c(`&eEnrichment Value: ${numberWithCommas(Math.round(talismanEnrichmentValue))}`)
+	}
+
+	if (item.getName().includes("Of Divan")) {
+		let gemstoneChambersValue = 0
+		if (extraAttributes.getInteger("gemstone_slots")) {
+			for (i = 0; i < extraAttributes.getInteger("gemstone_slots"); i++) {
+				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+			}
+			itemValue += gemstoneChambersValue
+			c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
+		}
+		else if (new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots"))) {
+			for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots")).length; i++) {
+				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+			}
+			itemValue += gemstoneChambersValue
+			c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
+		}
 	}
 
 	c(`Final Item Value: ${numberWithCommas(Math.round(itemValue))}`)

@@ -19,12 +19,14 @@ Currently, it can calculate:
 - The Art of War
 - Master Stars
 - Power Scrolls
+- Gemstones
 
 #### Armour
 - Enchantments (Regular + Ultimate)
 - Hot Potato Books + Fuming Potato Books
 - Armour Skins
 - Master Stars
+- Gemstones
 
 #### Pets
 - Pet Skins
@@ -35,13 +37,14 @@ Currently, it can calculate:
 
 #### Drills
 - Drill Parts
+- Gemstones
 
 #### Specific Items
 - AOTE / AOTV Etherwarp
-- Power Scrolls 
+- Power Scrolls
+- Gemstone Chambers for Divan Armour
 
 #### Upcoming Features:
-- Gemstones
 - Essence Value
 - Pet XP / Level
 - Reforge Stones

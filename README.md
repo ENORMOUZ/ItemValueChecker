@@ -1,2 +1,49 @@
 # ItemValueChecker
-Item Value Checker for Hypixel Skyblock
+Current Version: v1.0.0 (April 5th)
+
+#### NOTE: ItemValueChecker will only work with ChatTriggers 2.X. If you are still using ChatTriggers 1.3.2 or lower, update it at [ChatTriggers.com](https://chattriggers.com).
+
+ItemValueChecker is a [ChatTriggers](https://chattriggers.com) module that calculates the value of an item.
+
+Currently, it can calculate:
+
+#### All Items
+- Base Value (Lowest-Bin price in the Auction House)
+- Recombobulators
+
+#### Weapons
+- Enchantments (Regular + Ultimate)
+- Hot Potato Books + Fuming Potato Books
+- The Art of War
+- Master Stars
+- Power Scrolls
+
+#### Armour
+- Enchantments (Regular + Ultimate)
+- Hot Potato Books + Fuming Potato Books
+- Armour Skins
+- Master Stars
+
+#### Pets
+- Pet Skins
+- Pet items
+
+#### Talismans
+- Talisman Enrichments
+
+#### Drills
+- Drill Parts
+
+#### Specific Items
+- AOTE / AOTV Etherwarp
+- Power Scrolls 
+
+#### Upcoming Features:
+- Gemstones
+- Essence Value
+- Pet XP / Level
+- Reforge Stones
+- New Year Cake Bag cakes
+- Functionality with NEU / Skytils Profile Viewer
+- Value of Player Inventory
+- Add Item Value to bottom of item tooltip

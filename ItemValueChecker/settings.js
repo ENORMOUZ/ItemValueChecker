@@ -26,8 +26,8 @@ class Settings {
     notifyUpdates = true;
 
     @SwitchProperty({
-        name: "Add Item Value to Tooltip (IN PROGRESS)",
-        description: "Add Item Value to Tooltip (IN PROGRESS)",
+        name: "Add Item Value to Tooltip (WIP)",
+        description: "Add Item Value to Tooltip (WIP)",
         category: "ToolTip",
         subcategory: "General"
     })

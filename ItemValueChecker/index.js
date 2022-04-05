@@ -2,6 +2,7 @@ import settings from "./settings"
 import RenderLib from "../RenderLib"
 import request from "../requestV2"
 import sleep from '../sleep'
+import Lore from "../Lore";
 
 const mc = Client.getMinecraft()
 
@@ -50,12 +51,30 @@ register('step', () => {
 }).setDelay(120)
 
 register("guiKey", (key, gui, event) => {
-  	if (String(event).includes('net.minecraft.client.gui.inventory') && !String(event).includes('net.minecraft.client.gui.inventory.GuiEditSign') && Keyboard.isKeyDown(itemValueBind.getKeyCode()) === true) {
+  	if (String(event).includes('net.minecraft.client.gui.inventory.GuiEditSign') || !Keyboard.isKeyDown(itemValueBind.getKeyCode()) === true) return
+	// || String(event).includes("io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer")
+	if (String(event).includes('net.minecraft.client.gui.inventory.Gui')) {
 		if (Client.currentGui.get().getSlotUnderMouse()) {
 			let item = Player.getOpenedInventory().getStackInSlot(Client.currentGui.get().getSlotUnderMouse().field_75222_d)
 			if (!item) return
+			if (!item.getNBT().getCompoundTag("tag").getCompoundTag("ExtraAttributes").getString("id")) return
 			itemValueChecker(item)
 		}
+	}
+})
+
+register("itemTooltip", (lore, item) => {
+	if (settings.itemValueTooltip) {
+		if (!item.getNBT().getCompoundTag("tag").getCompoundTag("ExtraAttributes").getString("id")) return
+		for (i = 0; i < lore.length; i++) {
+			if (lore[i].includes("Item Value:")) {
+				itemValue = itemValueChecker1(item)
+				Lore.replace(item, i, `§r§cItem Value: ${numberWithCommas(Math.round(itemValue))}§r`)
+				return
+			}
+		}
+		itemValue = itemValueChecker1(item)
+		Lore.insert(item, 0, `§r§cItem Value: ${numberWithCommas(Math.round(itemValue))}§r`, true)
 	}
 })
 
@@ -219,6 +238,7 @@ function itemValueChecker(item) {
 	if (item.getName().includes("Of Divan")) {
 		let gemstoneChambersValue = 0
 		if (extraAttributes.getInteger("gemstone_slots")) {
+			c("Case 1")
 			for (i = 0; i < extraAttributes.getInteger("gemstone_slots"); i++) {
 				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
 			}
@@ -226,7 +246,9 @@ function itemValueChecker(item) {
 			c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
 		}
 		else if (new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots"))) {
+			c("case 2")
 			for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots")).length; i++) {
+				c(`case 2: ${i}`)
 				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
 			}
 			itemValue += gemstoneChambersValue
@@ -238,9 +260,147 @@ function itemValueChecker(item) {
 	c(` `)
 }
 
+function itemValueChecker1(item) {
+	const extraAttributes = item.getNBT().getCompoundTag("tag").getCompoundTag("ExtraAttributes")
+
+	let itemId = extraAttributes.getString("id")
+	let itemValue = lowestBinData[`${itemId}`]
+	let enchantsValue = 0
+	let gemsValue = 0
+
+	if (itemId.equals("PET")) {
+		let petInfo = extraAttributes.getString(["petInfo"])
+		petInfo = JSON.parse(petInfo)
+		itemId = `${petInfo["type"]};${petItemId(petInfo["tier"])}`
+		itemValue = lowestBinData[itemId]
+		let petItemValue = lowestBinData[petInfo["heldItem"]]
+		itemValue = itemValue + petItemValue
+		if (petInfo["skin"]) {
+			let petSkinValue = lowestBinData[`PET_SKIN_${petInfo["skin"]}`]
+			itemValue = itemValue + petSkinValue
+		}
+	}
+	for (i = 0; i < extraAttributes.getInteger("rarity_upgrades"); i++) {
+		itemValue += Number(bazaarData["products"]["RECOMBOBULATOR_3000"]["buy_summary"][0]["pricePerUnit"])
+	}
+	for (i = 0; i < extraAttributes.getInteger("art_of_war_count"); i++) {
+		itemValue += Number(lowestBinData['THE_ART_OF_WAR'])
+	}
+	if (extraAttributes.getInteger("hot_potato_count") > 0 && extraAttributes.getInteger("hot_potato_count") <= 10) {
+		for (i = 0; i < extraAttributes.getInteger("hot_potato_count"); i++) {
+			itemValue += Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
+		}
+	}
+	else if (extraAttributes.getInteger("hot_potato_count") > 10) {
+		for (i = 0; i < 10; i++) {
+			itemValue += Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
+		}
+		for (i = 0; i < (extraAttributes.getInteger("hot_potato_count") - 10); i++) {
+			itemValue += Number(bazaarData["products"]["FUMING_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
+		}
+	}
+	for (i = 0; i < extraAttributes.getInteger("ethermerge"); i++) {
+		itemValue += Number(lowestBinData["ETHERWARP_CONDUIT"])
+	}
+
+	for (let enchant of extraAttributes.getCompoundTag("enchantments").getKeySet()) {
+		if (enchant in enchantsData['NORMAL']) {
+			if (enchantsData['NORMAL'][enchant]['calculate'] === "true") {
+				enchantsValue += Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+			}
+			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['goodLevel'])) {
+				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['goodLevel']}`])
+			}
+			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['maxLevel'])) {
+				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['maxLevel']}`])
+			}
+		} else if (enchant in enchantsData['ULTIMATE']) {
+			enchantsValue += Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+		}
+	}
+	if (enchantsValue > 0) {
+		itemValue += enchantsValue
+	}
+
+	if (Number(extraAttributes.getInteger('dungeon_item_level')) > 5) {
+		let masterStarCount = Number(extraAttributes.getInteger('dungeon_item_level')) - 5
+		let masterStarValue = 0
+		for (let star of Array.from(Array(masterStarCount).keys())) {
+			star = Number(star) + 1
+			itemValue += Number(lowestBinData[masterStarData[String(star)]])
+			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
+		}
+	}
+
+	for (let gem of extraAttributes.getCompoundTag("gems").getKeySet()) {
+		if (!gem.endsWith("_gem") && gem != "unlocked_slots") {
+			if (!extraAttributes.getCompoundTag("gems").getString(`${gem}_gem`)) {
+				part_2 = gem.substring(0, gem.lastIndexOf("_"))
+			}
+			else {
+				part_2 = extraAttributes.getCompoundTag("gems").getString(`${gem}_gem`)
+			}
+			gemsValue += Number(bazaarData["products"][`${extraAttributes.getCompoundTag("gems").getString(gem).toUpperCase()}_${part_2.toUpperCase()}_GEM`]["buy_summary"][0]["pricePerUnit"])
+		}
+	}
+
+	if (gemsValue > 0) {
+		itemValue += gemsValue
+	}
+
+	if (extraAttributes.getString("power_ability_scroll")) {
+		let powerScrollValue = Number(lowestBinData[extraAttributes.getString("power_ability_scroll")])
+		itemValue += powerScrollValue
+	}
+
+	if (item.getName().includes("Drill")) {
+		let drillPartsValue = 0
+		if (extraAttributes.getString("drill_part_upgrade_module")) {
+			drillPartsValue = drillPartsValue + Number(lowestBinData[extraAttributes.getString("drill_part_upgrade_module").toUpperCase()])
+		}
+		if (extraAttributes.getString("drill_part_engine")) {
+			drillPartsValue = drillPartsValue + Number(lowestBinData[extraAttributes.getString("drill_part_engine").toUpperCase()])
+		}
+		if (extraAttributes.getString("drill_part_fuel_tank")) {
+			drillPartsValue = drillPartsValue + Number(lowestBinData[extraAttributes.getString("drill_part_fuel_tank").toUpperCase()])
+		}
+		itemValue += drillPartsValue
+	}
+
+	if (extraAttributes.getString("skin")) {
+		let itemSkinValue = Number(lowestBinData[extraAttributes.getString("skin")])
+		itemValue += itemSkinValue
+	}
+
+	if (extraAttributes.getString("talisman_enrichment")) {
+		let talismanEnrichmentValue = Number(lowestBinData[`TALISMAN_ENRICHMENT_${extraAttributes.getString("talisman_enrichment")}`])
+		itemValue += talismanEnrichmentValue
+	}
+
+	if (item.getName().includes("Of Divan")) {
+		let gemstoneChambersValue = 0
+		if (extraAttributes.getInteger("gemstone_slots")) {
+			for (i = 0; i < extraAttributes.getInteger("gemstone_slots"); i++) {
+				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+			}
+			itemValue += gemstoneChambersValue
+		}
+		else if (new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots"))) {
+			for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots")).length; i++) {
+				c(`case 2: ${i}`)
+				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+			}
+			itemValue += gemstoneChambersValue
+		}
+	}
+	
+	return itemValue
+}
+
 register("command", (...args) => {
     if (!args) {
-        c(`&eItem Value Checker v1.0.0 by ENORMOUZ. Check the value of an item by opening a chest GUI (e.g Auction House or your inventory), and tapping the key (Default is "I") for the item value checker in Controls. You can also hold the item and type: "/iv", "/itemvalue", "/iw" or "/itemworth". Thanks for downloading my module!`)
+        //c(`&eItem Value Checker v1.0.0 by ENORMOUZ. Check the value of an item by opening a chest GUI (e.g Auction House or your inventory), and tapping the key (Default is "I") for the item value checker in Controls. You can also hold the item and type: "/iv", "/itemvalue", "/iw" or "/itemworth". Thanks for downloading my module!`)
+		settings.openGUI()
     }
     // Refresh Data
     else if (args[0] === "request") {

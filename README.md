@@ -12,6 +12,7 @@ Currently, it can calculate:
 #### All Items
 - Base Value (Lowest-Bin price in the Auction House)
 - Recombobulators
+- Add Item Value to bottom of item tooltip (WIP)
 
 #### Weapons
 - Enchantments (Regular + Ultimate)
@@ -51,4 +52,3 @@ Currently, it can calculate:
 - New Year Cake Bag cakes
 - Functionality with NEU / Skytils Profile Viewer
 - Value of Player Inventory
-- Add Item Value to bottom of item tooltip

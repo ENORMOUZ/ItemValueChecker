@@ -1,10 +1,18 @@
 import settings from "./settings"
-import RenderLib from "../RenderLib"
 import request from "../requestV2"
-import sleep from '../sleep'
 import Lore from "../Lore";
 
 const mc = Client.getMinecraft()
+const fontRenderer = Renderer.getFontRenderer()
+const GuiButton = Java.type("net.minecraft.client.gui.GuiButton")
+const GuiTextField = Java.type("net.minecraft.client.gui.GuiTextField")
+const GuiContainer = Java.type('net.minecraft.client.gui.inventory.GuiContainer')
+const tileSign = Java.type("net.minecraft.client.gui.inventory.GuiEditSign").class.getDeclaredField("field_146848_f")
+const doneBtn = Java.type("net.minecraft.client.gui.inventory.GuiEditSign").class.getDeclaredField("field_146852_i")
+const ChatComponentText = Java.type("net.minecraft.util.ChatComponentText")
+
+tileSign.setAccessible(true)
+doneBtn.setAccessible(true)
 
 const itemValueBind = new KeyBind("Item Value Checker", Keyboard.KEY_I, "ItemValueChecker")
 
@@ -17,14 +25,20 @@ function c(message) { ChatLib.chat(message) }
 function s(message) { ChatLib.say(message) }
 
 let lowestBinData = {}
+let averageLowestBinData = {}
 let bazaarData = {}
 let enchantsData = {}
 let masterStarData = {"1": "FIRST_MASTER_STAR", "2": "SECOND_MASTER_STAR", "3": "THIRD_MASTER_STAR", "4": "FOURTH_MASTER_STAR", "5": "FIFTH_MASTER_STAR"}
 
-// Switch to my own API when possible
 function fetchLowestBin() {
 	request(`https://moulberry.codes/lowestbin.json`).then((data1) => {
 		lowestBinData = JSON.parse(data1)
+	})
+}
+
+function fetchAverageLowestBin() {
+	request(`https://moulberry.codes/auction_averages_lbin/1day.json`).then((data1) => {
+		averageLowestBinData = JSON.parse(data1)
 	})
 }
 
@@ -41,18 +55,19 @@ function fetchEnchants() {
 }
 
 fetchLowestBin()
+fetchAverageLowestBin()
 fetchBazaar()
 fetchEnchants()
 
 register('step', () => {
 	fetchLowestBin()
+	fetchAverageLowestBin()
 	fetchBazaar()
 	fetchEnchants()
-}).setDelay(120)
+}).setDelay(60)
 
 register("guiKey", (key, gui, event) => {
   	if (String(event).includes('net.minecraft.client.gui.inventory.GuiEditSign') || !Keyboard.isKeyDown(itemValueBind.getKeyCode()) === true) return
-	// || String(event).includes("io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer")
 	if (String(event).includes('net.minecraft.client.gui.inventory.Gui')) {
 		if (Client.currentGui.get().getSlotUnderMouse()) {
 			let item = Player.getOpenedInventory().getStackInSlot(Client.currentGui.get().getSlotUnderMouse().field_75222_d)
@@ -74,7 +89,7 @@ register("itemTooltip", (lore, item) => {
 			}
 		}
 		itemValue = itemValueChecker1(item)
-		Lore.insert(item, 0, `§r§cItem Value: ${numberWithCommas(Math.round(itemValue))}§r`, true)
+		Lore.append(item, `§r§cItem Value: ${numberWithCommas(Math.round(itemValue))}§r`, true)
 	}
 })
 
@@ -114,11 +129,19 @@ function itemValueChecker(item) {
 		itemId = `${petInfo["type"]};${petItemId(petInfo["tier"])}`
 		itemValue = lowestBinData[itemId]
 		c(`Item Value: ${numberWithCommas(Math.round(itemValue))}`)
-		let petItemValue = lowestBinData[petInfo["heldItem"]]
-		itemValue = itemValue + petItemValue
-		c(`&ePet Item Value: ${numberWithCommas(Math.round(petItemValue))}`)
+		if (petInfo["heldItem"]) {
+			let petItemValue = 0
+			if (petInfo["heldItem"] in lowestBinData) {
+				petItemValue = lowestBinData[petInfo["heldItem"]]
+			}
+			itemValue = itemValue + petItemValue
+			c(`&ePet Item Value: ${numberWithCommas(Math.round(petItemValue))}`)
+		}
 		if (petInfo["skin"]) {
-			let petSkinValue = lowestBinData[`PET_SKIN_${petInfo["skin"]}`]
+			let petSkinValue = 0
+			if (`PET_SKIN_${petInfo["skin"]}` in lowestBinData) {
+				petSkinValue = lowestBinData[`PET_SKIN_${petInfo["skin"]}`]
+			}
 			itemValue = itemValue + petSkinValue
 			c(`&ePet Skin Value: ${numberWithCommas(Math.round(petSkinValue))}`)
 		}
@@ -155,18 +178,38 @@ function itemValueChecker(item) {
 	}
 
 	for (let enchant of extraAttributes.getCompoundTag("enchantments").getKeySet()) {
-		if (enchant in enchantsData['NORMAL']) {
-			if (enchantsData['NORMAL'][enchant]['calculate'] === "true") {
-				enchantsValue += Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+		if (enchant.toLowerCase() in enchantsData['NORMAL']) {
+			if (enchantsData['NORMAL'][enchant.toLowerCase()]['calculate'] === "true") {
+				let numberToAdd = Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+				if (!numberToAdd) {
+					numberToAdd = Number(Number(averageLowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+					if (!numberToAdd) continue
+				}
+				enchantsValue += numberToAdd
 			}
-			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['goodLevel'])) {
-				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['goodLevel']}`])
+			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant.toLowerCase()]['goodLevel'])) {
+				let numberToAdd = Number(lowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['goodLevel']}`])
+				if (!numberToAdd) {
+					Number(averageLowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['goodLevel']}`])
+					if (!numberToAdd) continue
+				}
+				enchantsValue += numberToAdd
 			}
-			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['maxLevel'])) {
-				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['maxLevel']}`])
+			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant.toLowerCase()]['maxLevel'])) {
+				let numberToAdd = Number(lowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['maxLevel']}`])
+				if (!numberToAdd) {
+					numberToAdd = Number(averageLowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['maxLevel']}`])
+					if (!numberToAdd) continue
+				}
+				enchantsValue += numberToAdd
 			}
-		} else if (enchant in enchantsData['ULTIMATE']) {
-			enchantsValue += Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+		} else if (enchant.toLowerCase() in enchantsData['ULTIMATE']) {
+			let numberToAdd = Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+			if (!numberToAdd) {
+				numberToAdd = Number(Number(averageLowestBinData[`${enchantsData['ULTIMATE'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+				if (!numberToAdd) continue
+			}
+			enchantsValue += numberToAdd
 		}
 	}
 	if (enchantsValue > 0) {
@@ -176,6 +219,26 @@ function itemValueChecker(item) {
 
 	if (Number(extraAttributes.getInteger('dungeon_item_level')) > 5) {
 		let masterStarCount = Number(extraAttributes.getInteger('dungeon_item_level')) - 5
+		let masterStarValue = 0
+		for (let star of Array.from(Array(masterStarCount).keys())) {
+			star = Number(star) + 1
+			itemValue += Number(lowestBinData[masterStarData[String(star)]])
+			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
+		}
+		c(`&eMaster Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
+	}
+	else if (Number(extraAttributes.getInteger('dungeon_item_level')) == 5 && Number(extraAttributes.getInteger('upgrade_level') > 5)) {
+		let masterStarCount = Number(extraAttributes.getInteger('upgrade_level')) - 5
+		let masterStarValue = 0
+		for (let star of Array.from(Array(masterStarCount).keys())) {
+			star = Number(star) + 1
+			itemValue += Number(lowestBinData[masterStarData[String(star)]])
+			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
+		}
+		c(`&eMaster Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
+	}
+	else if (Number(extraAttributes.getInteger('dungeon_item')) == 1 && Number(extraAttributes.getInteger('upgrade_level') > 5)) {
+		let masterStarCount = Number(extraAttributes.getInteger('upgrade_level')) - 5
 		let masterStarValue = 0
 		for (let star of Array.from(Array(masterStarCount).keys())) {
 			star = Number(star) + 1
@@ -238,21 +301,22 @@ function itemValueChecker(item) {
 	if (item.getName().includes("Of Divan")) {
 		let gemstoneChambersValue = 0
 		if (extraAttributes.getInteger("gemstone_slots")) {
-			c("Case 1")
 			for (i = 0; i < extraAttributes.getInteger("gemstone_slots"); i++) {
 				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
 			}
 			itemValue += gemstoneChambersValue
 			c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
 		}
-		else if (new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots"))) {
-			c("case 2")
-			for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots")).length; i++) {
-				c(`case 2: ${i}`)
-				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+		else {
+			for (let gem of extraAttributes.getCompoundTag("gems").getKeySet()) {
+				if (gem == "unlocked_slots") {
+					for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagList("unlocked_slots", 8)).tagCount; i++) {
+						gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+					}
+					itemValue += gemstoneChambersValue
+					c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
+				}
 			}
-			itemValue += gemstoneChambersValue
-			c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
 		}
 	}
 
@@ -273,10 +337,18 @@ function itemValueChecker1(item) {
 		petInfo = JSON.parse(petInfo)
 		itemId = `${petInfo["type"]};${petItemId(petInfo["tier"])}`
 		itemValue = lowestBinData[itemId]
-		let petItemValue = lowestBinData[petInfo["heldItem"]]
-		itemValue = itemValue + petItemValue
+		if (petInfo["heldItem"]) {
+			let petItemValue = 0
+			if (petInfo["heldItem"] in lowestBinData) {
+				petItemValue = lowestBinData[petInfo["heldItem"]]
+			}
+			itemValue = itemValue + petItemValue
+		}
 		if (petInfo["skin"]) {
-			let petSkinValue = lowestBinData[`PET_SKIN_${petInfo["skin"]}`]
+			let petSkinValue = 0
+			if (`PET_SKIN_${petInfo["skin"]}` in lowestBinData) {
+				petSkinValue = lowestBinData[`PET_SKIN_${petInfo["skin"]}`]
+			}
 			itemValue = itemValue + petSkinValue
 		}
 	}
@@ -304,18 +376,38 @@ function itemValueChecker1(item) {
 	}
 
 	for (let enchant of extraAttributes.getCompoundTag("enchantments").getKeySet()) {
-		if (enchant in enchantsData['NORMAL']) {
-			if (enchantsData['NORMAL'][enchant]['calculate'] === "true") {
-				enchantsValue += Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+		if (enchant.toLowerCase() in enchantsData['NORMAL']) {
+			if (enchantsData['NORMAL'][enchant.toLowerCase()]['calculate'] === "true") {
+				let numberToAdd = Number(Number(lowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+				if (!numberToAdd) {
+					numberToAdd = Number(Number(averageLowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+					if (!numberToAdd) continue
+				}
+				enchantsValue += numberToAdd
 			}
-			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['goodLevel'])) {
-				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['goodLevel']}`])
+			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant.toLowerCase()]['goodLevel'])) {
+				let numberToAdd = Number(lowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['goodLevel']}`])
+				if (!numberToAdd) {
+					Number(averageLowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['goodLevel']}`])
+					if (!numberToAdd) continue
+				}
+				enchantsValue += numberToAdd
 			}
-			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant]['maxLevel'])) {
-				enchantsValue += Number(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${enchantsData['NORMAL'][enchant]['maxLevel']}`])
+			else if (Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant)) === Number(enchantsData['NORMAL'][enchant.toLowerCase()]['maxLevel'])) {
+				let numberToAdd = Number(lowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['maxLevel']}`])
+				if (!numberToAdd) {
+					numberToAdd = Number(averageLowestBinData[`${enchantsData['NORMAL'][enchant.toLowerCase()]['neuName']};${enchantsData['NORMAL'][enchant.toLowerCase()]['maxLevel']}`])
+					if (!numberToAdd) continue
+				}
+				enchantsValue += numberToAdd
 			}
-		} else if (enchant in enchantsData['ULTIMATE']) {
-			enchantsValue += Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+		} else if (enchant.toLowerCase() in enchantsData['ULTIMATE']) {
+			let numberToAdd = Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+			if (!numberToAdd) {
+				numberToAdd = Number(Number(averageLowestBinData[`${enchantsData['ULTIMATE'][enchant.toLowerCase()]['neuName']};1`]) * Number(enchantsData['COSTS'][String(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))]))
+				if (!numberToAdd) continue
+			}
+			enchantsValue += numberToAdd
 		}
 	}
 	if (enchantsValue > 0) {
@@ -324,6 +416,24 @@ function itemValueChecker1(item) {
 
 	if (Number(extraAttributes.getInteger('dungeon_item_level')) > 5) {
 		let masterStarCount = Number(extraAttributes.getInteger('dungeon_item_level')) - 5
+		let masterStarValue = 0
+		for (let star of Array.from(Array(masterStarCount).keys())) {
+			star = Number(star) + 1
+			itemValue += Number(lowestBinData[masterStarData[String(star)]])
+			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
+		}
+	}
+	else if (Number(extraAttributes.getInteger('dungeon_item_level')) == 5 && Number(extraAttributes.getInteger('upgrade_level') > 5)) {
+		let masterStarCount = Number(extraAttributes.getInteger('upgrade_level')) - 5
+		let masterStarValue = 0
+		for (let star of Array.from(Array(masterStarCount).keys())) {
+			star = Number(star) + 1
+			itemValue += Number(lowestBinData[masterStarData[String(star)]])
+			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
+		}
+	}
+	else if (Number(extraAttributes.getInteger('dungeon_item')) == 1 && Number(extraAttributes.getInteger('upgrade_level') > 5)) {
+		let masterStarCount = Number(extraAttributes.getInteger('upgrade_level')) - 5
 		let masterStarValue = 0
 		for (let star of Array.from(Array(masterStarCount).keys())) {
 			star = Number(star) + 1
@@ -385,29 +495,262 @@ function itemValueChecker1(item) {
 			}
 			itemValue += gemstoneChambersValue
 		}
-		else if (new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots"))) {
-			for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagMap().get("unlocked_slots")).length; i++) {
-				c(`case 2: ${i}`)
-				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+		else {
+			for (let gem of extraAttributes.getCompoundTag("gems").getKeySet()) {
+				if (gem == "unlocked_slots") {
+					for (i = 0; i < new NBTTagList(extraAttributes.getCompoundTag("gems").getTagList("unlocked_slots", 8)).tagCount; i++) {
+						gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
+					}
+					itemValue += gemstoneChambersValue
+				}
 			}
-			itemValue += gemstoneChambersValue
 		}
 	}
 	
 	return itemValue
 }
 
+class priceInput {
+	static priceInputClicked = false
+	static priceInputListPrice = 0
+	static inventoryButtons = [
+		{
+			id: "priceInputMacro",
+			btn: new GuiButton(501, 410, 140, 100, 20, "BIN Price -1"),
+			guiclass: GuiContainer,
+			title: "Create BIN Auction",
+			mouse: [0],
+			result: priceInputMacro
+		},
+		{
+			id: "priceInputManual",
+			btn: new GuiButton(501, 410, 180, 100, 20, "Custom Price"),
+			guiclass: GuiContainer,
+			title: "Create BIN Auction",
+			mouse: [0],
+			result: priceInputManual
+		},
+		{
+			id: "priceInputMacro",
+			btn: new GuiButton(501, 410, 200, 100, 20, "BIN Price -1 6H"),
+			guiclass: GuiContainer,
+			title: "Create BIN Auction",
+			mouse: [0],
+			result: priceInputMacro1
+		}
+	]
+	static priceInputManualTextField = new GuiTextField(0, Client.getMinecraft().field_71466_p,  410, 162, 100, 15)
+	static priceInputManualPrice = 0
+}
+
+function priceInputMacro1() {
+	let inventory = Player.getOpenedInventory()
+	inventory.click(31, false, "MIDDLE")
+	priceInput.priceInputClicked = "true2"
+}
+
+
+function priceInputMacro() {
+	let inventory = Player.getOpenedInventory()
+	inventory.click(31, false, "MIDDLE")
+	priceInput.priceInputClicked = true
+}
+
+function priceInputManual() {
+	let inventory = Player.getOpenedInventory()
+	inventory.click(31, false, "MIDDLE")
+	priceInput.priceInputClicked = "true1"
+}
+
+register("tick", () => {
+	if (!Client.isInGui()) {
+	  	priceInput.priceInputManualTextField.func_146195_b(false) // setfocused
+	}
+	else {
+		priceInput.priceInputManualPrice = priceInput.priceInputManualTextField.func_146179_b()
+	}
+})
+
+register("guiRender", (x, y) => {
+	if (Client.currentGui.getClassName() === "GuiChest" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Create BIN Auction")) {
+		// insert settings "display lowest bin price when creating bin auction?"
+		try {
+			let inventory = Player.getOpenedInventory()
+			let item = inventory.getStackInSlot(13)
+			const extraAttributes = item.getNBT().getCompoundTag("tag").getCompoundTag("ExtraAttributes")
+			let itemId = item.getNBT().getCompoundTag("tag").getCompoundTag("ExtraAttributes").getString("id")
+			if (itemId === "") {return}
+			let lowestBinPrice = lowestBinData[`${itemId}`]
+			let itemValue = 0
+			if (itemId.includes("ENCHANTED_BOOK")) {
+				for (let enchant of extraAttributes.getCompoundTag("enchantments").getKeySet()) {
+					if (enchant in enchantsData['NORMAL']) {
+						itemValue = itemValue + lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))}`]
+						console.log(lowestBinData[`${enchantsData['NORMAL'][enchant]['neuName']};${Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))}`])
+					}
+					else if (enchant in enchantsData['ULTIMATE']) {
+						itemValue = itemValue + Number(Number(lowestBinData[`${enchantsData['ULTIMATE'][enchant]['neuName']};${Number(extraAttributes.getCompoundTag("enchantments").getInteger(enchant))}`]))
+					}
+				}
+			}
+			else {
+				itemValue = lowestBinPrice
+			}
+			if (itemId.equals("PET")) {
+				let petInfo = extraAttributes.getString(["petInfo"])
+				petInfo = JSON.parse(petInfo)
+				itemId = `${petInfo["type"]};${petItemId(petInfo["tier"])}`
+				itemValue = lowestBinData[itemId]
+			}
+			priceInput.priceInputListPrice = Math.round(itemValue - 1)
+			let text = priceInput.priceInputListPrice;
+			let xPos = Renderer.screen.getWidth() / 1.56 + Renderer.getStringWidth(text) / 1.45;
+			let yPos = 125
+			fontRenderer.func_78276_b(text, xPos, yPos, Renderer.RED)
+		}
+		catch (e) {
+			return
+		}	
+	}
+	if (Client.currentGui.getClassName() === "GuiEditSign" && priceInput.priceInputClicked === true) {
+		let currentTileSign = tileSign.get(Client.currentGui.get())
+		currentTileSign.field_145915_a[0] = new ChatComponentText(`${priceInput.priceInputListPrice}`)
+		currentTileSign.func_70296_d()
+		mc.func_147108_a(null)
+		priceInput.priceInputClicked = "done"
+	}
+	if (Client.currentGui.getClassName() === "GuiEditSign" && priceInput.priceInputClicked === "true1") {
+		let currentTileSign = tileSign.get(Client.currentGui.get())
+		currentTileSign.field_145915_a[0] = new ChatComponentText(`${priceInput.priceInputManualPrice}`)
+		currentTileSign.func_70296_d()
+		mc.func_147108_a(null)
+		priceInput.priceInputClicked = "done"
+	}
+	if (Client.currentGui.getClassName() === "GuiEditSign" && priceInput.priceInputClicked === "true2") {
+		let currentTileSign = tileSign.get(Client.currentGui.get())
+		currentTileSign.field_145915_a[0] = new ChatComponentText(`${priceInput.priceInputListPrice}`)
+		currentTileSign.func_70296_d()
+		mc.func_147108_a(null)
+		priceInput.priceInputClicked = "done1"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Create BIN Auction")) {
+		let inventory = Player.getOpenedInventory()
+		inventory.click(33, false, "MIDDLE")
+		priceInput.priceInputClicked = "done 1"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done1" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Create BIN Auction")) {
+		priceInput.priceInputClicked = "done 3"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done 1" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Auction Duration")) {
+		let inventory = Player.getOpenedInventory()
+		inventory.click(16, false, "MIDDLE")
+		priceInput.priceInputClicked = "done 2"
+	}
+	if (Client.currentGui.getClassName() === "GuiEditSign" && priceInput.priceInputClicked === "done 2") {
+		let currentTileSign = tileSign.get(Client.currentGui.get())
+		currentTileSign.field_145915_a[0] = new ChatComponentText("336")
+		currentTileSign.func_70296_d()
+		mc.func_147108_a(null)
+		priceInput.priceInputClicked = "done 3"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done 3" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Create BIN Auction")) {
+		let inventory = Player.getOpenedInventory()
+		inventory.click(29, false, "MIDDLE")
+		priceInput.priceInputClicked = "done 4"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done 4" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Confirm BIN Auction")) {
+		let inventory = Player.getOpenedInventory()
+		inventory.click(11, false, "MIDDLE")
+		priceInput.priceInputClicked = "done 5"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done 5" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("Confirm BIN Auction")) {
+		let inventory = Player.getOpenedInventory()
+		inventory.click(11, false, "MIDDLE")
+		priceInput.priceInputClicked = "done 6"
+	}
+	if (Client.currentGui.getClassName() === "GuiChest" && priceInput.priceInputClicked === "done 6" && ChatLib.removeFormatting(Player.getOpenedInventory().getName()).includes("BIN Auction View")) {
+		let inventory = Player.getOpenedInventory()
+		inventory.click(49, false, "MIDDLE")
+		priceInput.priceInputClicked = false
+	}
+})
+
+register("guiRender", (x, y) => {
+	priceInput.inventoryButtons.forEach(button => {
+		try {
+			if (
+				(
+					button.guiclass === GuiContainer &&
+					Player !== null &&
+					Player.getOpenedInventory() !== null &&
+					Player.getOpenedInventory().getName().match(button.title)
+				) ||
+				button.guiclass !== GuiContainer
+			) button.btn.func_146112_a(mc, x, y)
+		}
+		catch (e) {
+			return
+		}
+    })
+	try {
+		if (Player !== null && Player.getOpenedInventory() !== null && Player.getOpenedInventory().getName().match("Create BIN Auction")) {
+			priceInput.priceInputManualTextField.func_146194_f() // draw text box
+		}
+	} catch (e) {}
+})
+
+register("guiKey", (char, keyCode, gui, event) => {
+	if (priceInput.priceInputManualTextField.func_146206_l()) { // if text box is focused
+	  	priceInput.priceInputManualTextField.func_146201_a(char, keyCode) // add character to text box
+	  	if (keyCode != 1) { // keycode for escape key
+			cancel(event)
+	  	}
+	}
+})
+
+register("guiMouseClick", (x, y, mbtn) => {
+    priceInput.inventoryButtons.forEach(button => {
+        if (button.btn.func_146115_a()) {
+            if (button.mouse.includes(mbtn)) {
+                if (Client.currentGui.get() instanceof button.guiclass) {
+					if (button.id.match("priceInputMacro")) {
+						if (
+							(
+								button.guiclass === GuiContainer &&
+								Player.getOpenedInventory() !== null &&
+								Player.getOpenedInventory().getName().match(button.title)
+							) ||
+							button.guiclass !== GuiContainer
+						) {
+							button.btn.func_146113_a(mc.func_147118_V());
+							button.result();
+						}
+					}
+					else if (button.id.match("priceInputManual")) {
+						if (
+							(
+								button.guiclass === GuiContainer &&
+								Player.getOpenedInventory() !== null &&
+								Player.getOpenedInventory().getName().match(button.title)
+							) ||
+							button.guiclass !== GuiContainer
+						) {
+							button.btn.func_146113_a(mc.func_147118_V());
+							button.result();
+						}
+					}
+                }
+            }
+        }
+    })
+	priceInput.priceInputManualTextField.func_146192_a(x, y, mbtn); // detect when click text box
+});
+
 register("command", (...args) => {
     if (!args) {
         //c(`&eItem Value Checker v1.0.0 by ENORMOUZ. Check the value of an item by opening a chest GUI (e.g Auction House or your inventory), and tapping the key (Default is "I") for the item value checker in Controls. You can also hold the item and type: "/iv", "/itemvalue", "/iw" or "/itemworth". Thanks for downloading my module!`)
 		settings.openGUI()
     }
-    // Refresh Data
-    else if (args[0] === "request") {
-        request(`https://moulberry.codes/lowestbin.json`).then((data1) => {
-          lowestBinData = JSON.parse(data1)
-      })
-  }
 }).setName("itemvaluechecker")
 
 register("command", (...args) => {

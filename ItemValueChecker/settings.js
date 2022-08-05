@@ -25,6 +25,7 @@ class Settings {
     })
     notifyUpdates = true;
 
+    /*
     @SwitchProperty({
         name: "Add Item Value to Tooltip (WIP)",
         description: "Add Item Value to Tooltip (WIP)",
@@ -32,6 +33,7 @@ class Settings {
         subcategory: "General"
     })
     itemValueTooltip = false;
+    */
 
 }
 

@@ -7,6 +7,8 @@ ItemValueChecker is a [ChatTriggers](https://chattriggers.com) module that calcu
 
 Check the value of an item by opening a chest GUI (e.g Auction House or your inventory), and tapping the key (Default is "I") for the item value checker in Controls. You can also hold the item and type: "/iv", "/itemvalue", "/iw" or "/itemworth".
 
+## Restart your game after downloading the module.
+
 ### For versions without Auction House Auto-List items, run "/ct import ItemValueChecker" in-game.
 
 ### Item Calculation

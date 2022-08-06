@@ -3,6 +3,6 @@
     "description": "Checks the value of an item in Hypixel Skyblock.",
     "author": "ENORMOUZ",
     "entry": "index.js",
-    "requires": ["Vigilance", "RenderLib", "CTAutocomplete", "RequestV2", "sleep"],
+    "requires": ["Vigilance", "RenderLib", "CTAutocomplete", "RequestV2", "Lore", "PogData"],
     "version": "1.0.1"
 }

@@ -3,7 +3,9 @@
 
 import settings from "./settings"
 import request from "../requestV2"
-import Lore from "../Lore";
+import Lore from "../Lore"
+
+import "./FirstInstall"
 
 const mc = Client.getMinecraft()
 const fontRenderer = Renderer.getFontRenderer()
@@ -121,7 +123,7 @@ function itemValueChecker(item) {
 	const extraAttributes = item.getNBT().getCompoundTag("tag").getCompoundTag("ExtraAttributes")
 
 	let itemId = extraAttributes.getString("id")
-	c(`Name: ${ChatLib.removeFormatting(item.getName())}, Id: ${itemId}`)
+	c(`${settings.itemNameIDColour}Name: ${ChatLib.removeFormatting(item.getName())}, Id: ${itemId}`)
 	let itemValue = lowestBinData[`${itemId}`]
 	let enchantsValue = 0
 	let gemsValue = 0
@@ -131,14 +133,14 @@ function itemValueChecker(item) {
 		petInfo = JSON.parse(petInfo)
 		itemId = `${petInfo["type"]};${petItemId(petInfo["tier"])}`
 		itemValue = lowestBinData[itemId]
-		c(`Item Value: ${numberWithCommas(Math.round(itemValue))}`)
+		c(`${settings.itemBaseValueColour}Item Value: ${numberWithCommas(Math.round(itemValue))}`)
 		if (petInfo["heldItem"]) {
 			let petItemValue = 0
 			if (petInfo["heldItem"] in lowestBinData) {
 				petItemValue = lowestBinData[petInfo["heldItem"]]
 			}
 			itemValue = itemValue + petItemValue
-			c(`&ePet Item Value: ${numberWithCommas(Math.round(petItemValue))}`)
+			c(`${settings.itemUpgradesColour}Pet Item Value: ${numberWithCommas(Math.round(petItemValue))}`)
 		}
 		if (petInfo["skin"]) {
 			let petSkinValue = 0
@@ -146,25 +148,25 @@ function itemValueChecker(item) {
 				petSkinValue = lowestBinData[`PET_SKIN_${petInfo["skin"]}`]
 			}
 			itemValue = itemValue + petSkinValue
-			c(`&ePet Skin Value: ${numberWithCommas(Math.round(petSkinValue))}`)
+			c(`${settings.itemUpgradesColour}Pet Skin Value: ${numberWithCommas(Math.round(petSkinValue))}`)
 		}
 	}
 	else {
-		c(`Item Value: ${numberWithCommas(Math.round(itemValue))}`)
+		c(`${settings.itemBaseValueColour}Item Value: ${numberWithCommas(Math.round(itemValue))}`)
 	}
 	for (i = 0; i < extraAttributes.getInteger("rarity_upgrades"); i++) {
 		itemValue += Number(bazaarData["products"]["RECOMBOBULATOR_3000"]["buy_summary"][0]["pricePerUnit"])
-		c(`&eRecombed: ${numberWithCommas(Math.round(bazaarData["products"]["RECOMBOBULATOR_3000"]["buy_summary"][0]["pricePerUnit"]))}`)
+		c(`${settings.itemUpgradesColour}Recombed: ${numberWithCommas(Math.round(bazaarData["products"]["RECOMBOBULATOR_3000"]["buy_summary"][0]["pricePerUnit"]))}`)
 	}
 	for (i = 0; i < extraAttributes.getInteger("art_of_war_count"); i++) {
 		itemValue += Number(lowestBinData['THE_ART_OF_WAR'])
-		c(`&eArt of war'ed: ${numberWithCommas(Math.round(lowestBinData['THE_ART_OF_WAR']))}`)
+		c(`${settings.itemUpgradesColour}Art of war'ed: ${numberWithCommas(Math.round(lowestBinData['THE_ART_OF_WAR']))}`)
 	}
 	if (extraAttributes.getInteger("hot_potato_count") > 0 && extraAttributes.getInteger("hot_potato_count") <= 10) {
 		for (i = 0; i < extraAttributes.getInteger("hot_potato_count"); i++) {
 			itemValue += Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
 		}
-		c(`&eHpb'ed x ${extraAttributes.getInteger("hot_potato_count")}: ${numberWithCommas(Math.round((bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * extraAttributes.getInteger("hot_potato_count")))}`)
+		c(`${settings.itemUpgradesColour}Hpb'ed x ${extraAttributes.getInteger("hot_potato_count")}: ${numberWithCommas(Math.round((bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * extraAttributes.getInteger("hot_potato_count")))}`)
 	}
 	else if (extraAttributes.getInteger("hot_potato_count") > 10) {
 		for (i = 0; i < 10; i++) {
@@ -173,11 +175,11 @@ function itemValueChecker(item) {
 		for (i = 0; i < (extraAttributes.getInteger("hot_potato_count") - 10); i++) {
 			itemValue += Number(bazaarData["products"]["FUMING_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"])
 		}
-		c(`&eHpb'ed and Fuming'ed x ${extraAttributes.getInteger("hot_potato_count")}: ${numberWithCommas(Math.round((Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * 10) + (Number(bazaarData["products"]["FUMING_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * (extraAttributes.getInteger("hot_potato_count") - 10))))}`)
+		c(`${settings.itemUpgradesColour}Hpb'ed and Fuming'ed x ${extraAttributes.getInteger("hot_potato_count")}: ${numberWithCommas(Math.round((Number(bazaarData["products"]["HOT_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * 10) + (Number(bazaarData["products"]["FUMING_POTATO_BOOK"]["buy_summary"][0]["pricePerUnit"]) * (extraAttributes.getInteger("hot_potato_count") - 10))))}`)
 	}
 	for (i = 0; i < extraAttributes.getInteger("ethermerge"); i++) {
 		itemValue += Number(lowestBinData["ETHERWARP_CONDUIT"])
-		c(`&eEtherwarp'ed: ${numberWithCommas(Math.round(lowestBinData["ETHERWARP_CONDUIT"]))}`)
+		c(`${settings.itemUpgradesColour}Etherwarp'ed: ${numberWithCommas(Math.round(lowestBinData["ETHERWARP_CONDUIT"]))}`)
 	}
 
 	for (let enchant of extraAttributes.getCompoundTag("enchantments").getKeySet()) {
@@ -217,7 +219,7 @@ function itemValueChecker(item) {
 	}
 	if (enchantsValue > 0) {
 		itemValue += enchantsValue
-		c(`&eEnchants: ${numberWithCommas(Math.round(enchantsValue))}`)
+		c(`${settings.itemUpgradesColour}Enchants: ${numberWithCommas(Math.round(enchantsValue))}`)
 	}
 
 	if (Number(extraAttributes.getInteger('dungeon_item_level')) > 5) {
@@ -228,7 +230,7 @@ function itemValueChecker(item) {
 			itemValue += Number(lowestBinData[masterStarData[String(star)]])
 			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
 		}
-		c(`&eMaster Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
+		c(`${settings.itemUpgradesColour}Master Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
 	}
 	else if (Number(extraAttributes.getInteger('dungeon_item_level')) == 5 && Number(extraAttributes.getInteger('upgrade_level') > 5)) {
 		let masterStarCount = Number(extraAttributes.getInteger('upgrade_level')) - 5
@@ -238,7 +240,7 @@ function itemValueChecker(item) {
 			itemValue += Number(lowestBinData[masterStarData[String(star)]])
 			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
 		}
-		c(`&eMaster Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
+		c(`${settings.itemUpgradesColour}Master Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
 	}
 	else if (Number(extraAttributes.getInteger('dungeon_item')) == 1 && Number(extraAttributes.getInteger('upgrade_level') > 5)) {
 		let masterStarCount = Number(extraAttributes.getInteger('upgrade_level')) - 5
@@ -248,7 +250,7 @@ function itemValueChecker(item) {
 			itemValue += Number(lowestBinData[masterStarData[String(star)]])
 			masterStarValue = masterStarValue + Number(lowestBinData[masterStarData[String(star)]])
 		}
-		c(`&eMaster Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
+		c(`${settings.itemUpgradesColour}Master Stars x ${masterStarCount}: ${numberWithCommas(Math.round(masterStarValue))}`)
 	}
 
 	for (let gem of extraAttributes.getCompoundTag("gems").getKeySet()) {
@@ -265,13 +267,13 @@ function itemValueChecker(item) {
 
 	if (gemsValue > 0) {
 		itemValue += gemsValue
-		c(`&eGemstones: ${numberWithCommas(Math.round(gemsValue))}`)
+		c(`${settings.itemUpgradesColour}Gemstones: ${numberWithCommas(Math.round(gemsValue))}`)
 	}
 
 	if (extraAttributes.getString("power_ability_scroll")) {
 		let powerScrollValue = Number(lowestBinData[extraAttributes.getString("power_ability_scroll")])
 		itemValue += powerScrollValue
-		c(`&ePower Scroll Value: ${numberWithCommas(Math.round(powerScrollValue))}`)
+		c(`${settings.itemUpgradesColour}Power Scroll Value: ${numberWithCommas(Math.round(powerScrollValue))}`)
 	}
 
 	if (item.getName().includes("Drill")) {
@@ -286,19 +288,19 @@ function itemValueChecker(item) {
 			drillPartsValue = drillPartsValue + Number(lowestBinData[extraAttributes.getString("drill_part_fuel_tank").toUpperCase()])
 		}
 		itemValue += drillPartsValue
-		c(`&eDrill Parts Value: ${numberWithCommas(Math.round(drillPartsValue))}`)
+		c(`${settings.itemUpgradesColour}Drill Parts Value: ${numberWithCommas(Math.round(drillPartsValue))}`)
 	}
 
 	if (extraAttributes.getString("skin")) {
 		let itemSkinValue = Number(lowestBinData[extraAttributes.getString("skin")])
 		itemValue += itemSkinValue
-		c(`&eSkin Value: ${numberWithCommas(Math.round(itemSkinValue))}`)
+		c(`${settings.itemUpgradesColour}Skin Value: ${numberWithCommas(Math.round(itemSkinValue))}`)
 	}
 
 	if (extraAttributes.getString("talisman_enrichment")) {
 		let talismanEnrichmentValue = Number(lowestBinData[`TALISMAN_ENRICHMENT_${extraAttributes.getString("talisman_enrichment")}`])
 		itemValue += talismanEnrichmentValue
-		c(`&eEnrichment Value: ${numberWithCommas(Math.round(talismanEnrichmentValue))}`)
+		c(`${settings.itemUpgradesColour}Enrichment Value: ${numberWithCommas(Math.round(talismanEnrichmentValue))}`)
 	}
 
 	if (item.getName().includes("Of Divan")) {
@@ -308,7 +310,7 @@ function itemValueChecker(item) {
 				gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
 			}
 			itemValue += gemstoneChambersValue
-			c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
+			c(`${settings.itemUpgradesColour}Gemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
 		}
 		else {
 			for (let gem of extraAttributes.getCompoundTag("gems").getKeySet()) {
@@ -317,13 +319,13 @@ function itemValueChecker(item) {
 						gemstoneChambersValue += Number(lowestBinData["GEMSTONE_CHAMBER"])
 					}
 					itemValue += gemstoneChambersValue
-					c(`&eGemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
+					c(`${settings.itemUpgradesColour}Gemstone Chambers Value: ${numberWithCommas(Math.round(gemstoneChambersValue))}`)
 				}
 			}
 		}
 	}
 
-	c(`Final Item Value: ${numberWithCommas(Math.round(itemValue))}`)
+	c(`${settings.itemFinalValueColour}Final Item Value: ${numberWithCommas(Math.round(itemValue))}`)
 	c(` `)
 }
 
@@ -514,7 +516,7 @@ function itemValueChecker1(item) {
 }
 
 register("command", (...args) => {
-    if (!args) {
+    if (!args[0]) {
         //c(`&eItem Value Checker v1.0.0 by ENORMOUZ. Check the value of an item by opening a chest GUI (e.g Auction House or your inventory), and tapping the key (Default is "I") for the item value checker in Controls. You can also hold the item and type: "/iv", "/itemvalue", "/iw" or "/itemworth". Thanks for downloading my module!`)
 		settings.openGUI()
     }

@@ -4,5 +4,5 @@
     "author": "ENORMOUZ",
     "entry": "index.js",
     "requires": ["Vigilance", "RenderLib", "CTAutocomplete", "RequestV2", "sleep"],
-    "version": "1.0.0"
+    "version": "1.0.1"
 }

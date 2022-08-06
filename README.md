@@ -1,5 +1,5 @@
 # ItemValueChecker
-Current Version: v1.0.0 (August 5th)
+Latest Version: v1.0.1 (August 6th)
 
 #### NOTE: ItemValueChecker will only work with ChatTriggers 2.X. If you are still using ChatTriggers 1.3.2 or lower, update it at [ChatTriggers.com](https://chattriggers.com).
 

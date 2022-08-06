@@ -9,7 +9,7 @@ Check the value of an item by opening a chest GUI (e.g Auction House or your inv
 
 ## Restart your game after downloading the module.
 
-## If there are any issues, join the [discord](https://discord.gg/hHW9FPPjxG) and report them.
+## If there are any issues, join the [discord](https://discord.gg/wjChDvs9DT) and report them.
 
 ### Item Calculation
 

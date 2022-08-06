@@ -1,8 +1,0 @@
-{
-    "moduleName": "ItemValueChecker",
-    "latestVersion": "1.0.1",
-    "author": "ENORMOUZ",
-    "changelog": [
-        "Fixed some bugs with Auto-List button rendering, added toggle for Auto-List"
-    ]
-}

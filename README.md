@@ -11,8 +11,6 @@ Check the value of an item by opening a chest GUI (e.g Auction House or your inv
 
 ## If there are any issues, join the [discord](https://discord.gg/sQRtwNvaFU) and report them.
 
-### For versions without Auction House Auto-List items, run "/ct import ItemValueChecker" in-game.
-
 ### Item Calculation
 
 #### All Items

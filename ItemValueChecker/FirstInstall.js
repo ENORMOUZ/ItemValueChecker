@@ -15,7 +15,7 @@ register("step", () => {
     cc("&a&a&b&c&d&e")
     cc("&aThank you for installing ItemValueChecker!")
     cc("&a&a&b&c&d&e&r")
-    new TextComponent(gc("&6Click here &7to join my Discord server ")).setClick("open_url", "https://discord.gg/sQRtwNvaFU").setHover("show_text", "&9https://discord.gg/sQRtwNvaFU").chat()
+    new TextComponent(gc("&6Click here &7to join my Discord server ")).setClick("open_url", "https://discord.gg/hHW9FPPjxG").setHover("show_text", "&9https://discord.gg/hHW9FPPjxG").chat()
     cc("&7to make suggestions and report bugs!")
     cc("&a&a&b&c&d&d&e")
     ChatLib.chat(`&b&m${ChatLib.getChatBreak(" ")}`)

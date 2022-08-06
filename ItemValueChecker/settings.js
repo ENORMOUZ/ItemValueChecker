@@ -24,7 +24,7 @@ class Settings {
         placeholder: "Join"
     })
     MyDiscord() {
-        java.awt.Desktop.getDesktop().browse(new java.net.URI("https://discord.gg/sQRtwNvaFU"))
+        java.awt.Desktop.getDesktop().browse(new java.net.URI("https://discord.gg/hHW9FPPjxG"))
     }
 
     @TextProperty({

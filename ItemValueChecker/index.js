@@ -261,7 +261,7 @@ function itemValueChecker(item) {
 				new TextComponent(`${settings.itemUpgradesColour}Enchants: ${numberWithCommas(Math.round(enchantsValue))}`).setHover("show_text", enchantsText).chat()
 			}
 		}
-		if (settings.calculateMasterStars) {w
+		if (settings.calculateMasterStars) {
 			if (Number(extraAttributes.getInteger('dungeon_item_level')) > 5) {
 				let masterStarCount = Number(extraAttributes.getInteger('dungeon_item_level')) - 5
 				let masterStarValue = 0

@@ -10,11 +10,22 @@ import {
     @Vigilant,
 } from '../Vigilance/index';
 
-@Vigilant("ItemValueChecker")
+@Vigilant("ItemValueChecker", "ItemValueChecker", {
+    getCategoryComparator: () => (a, b) => {
+        const categories = ["General", "Calculation", "Colours"];
+        return categories.indexOf(a.name) - categories.indexOf(b.name);
+    }
+})
 class Settings {
-
     constructor() {
         this.initialize(this)
+        this.setCategoryDescription("General", 
+            `
+            &b&l&nItemValueChecker ${JSON.parse(FileLib.read("ItemValueChecker", "metadata.json")).version}
+
+            &7Made By ENORMOUZ
+            `
+        )
     }
 
     @ButtonProperty({
@@ -66,6 +77,38 @@ class Settings {
         subcategory: "Updates"
     })
     notifyUpdates = true;
+
+    @SwitchProperty({
+        name: "Calculate Enchants",
+        description: "Include enchants in item value calculation.",
+        category: "Calculation",
+        subcategory: "Item"
+    })
+    calculateEnchants = true;
+
+    @SwitchProperty({
+        name: "Calculate Skins",
+        description: "Include skins in item value calculation.",
+        category: "Calculation",
+        subcategory: "Item"
+    })
+    calculateSkins = true;
+
+    @SwitchProperty({
+        name: "Calculate Master Stars",
+        description: "Include master stars in item value calculation.",
+        category: "Calculation",
+        subcategory: "Item"
+    })
+    calculateMasterStars = true;
+
+    @SwitchProperty({
+        name: "Calculate Dyes",
+        description: "Include dyes in item value calculation.",
+        category: "Calculation",
+        subcategory: "Item"
+    })
+    calculateDyes = true;
 
     /*
     @SwitchProperty({

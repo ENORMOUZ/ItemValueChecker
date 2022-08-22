@@ -32,6 +32,7 @@ Check the value of an item by opening a chest GUI (e.g Auction House or your inv
 - Armour Skins
 - Master Stars
 - Gemstones
+- Dyes
 
 #### Pets
 - Pet Skins

@@ -126,7 +126,7 @@
             "neuName": "LOOTING"
         },
         "luck": {
-            "maxLevel": "5",
+            "maxLevel": "7",
             "neuName": "LUCK"
         },
         "mana_steal": {

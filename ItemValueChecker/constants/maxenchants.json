@@ -1,0 +1,392 @@
+{
+    "NORMAL": {
+        "bane_of_arthropods": {
+            "maxLevel": "7",
+            "neuName": "BANE_OF_ARTHROPODS"
+        },
+        "big_brain": {
+            "goodLevel": "3",
+            "maxLevel": "5",
+            "neuName": "BIG_BRAIN"
+        },
+        "blast_protection": {
+            "maxLevel": "7",
+            "neuName": "BLAST_PROTECTION"
+        },
+        "cayenne": {
+            "maxLevel": "5",
+            "neuName": "CAYENNE"
+        },
+        "champion": {
+            "maxLevel": "1",
+            "neuName": "CHAMPION"
+        },
+        "chance": {
+            "maxLevel": "5",
+            "neuName": "CHANCE"
+        },
+        "charm": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "CHARM"
+        },
+        "cleave": {
+            "maxLevel": "6",
+            "neuName": "CLEAVE"
+        },
+        "compact": {
+            "maxLevel": "1",
+            "neuName": "COMPACT"
+        },
+        "corruption": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "CORRUPTION"
+        },
+        "counter_strike": {
+            "maxLevel": "5",
+            "neuName": "COUNTER_STRIKE"
+        },
+        "critical": {
+            "maxLevel": "7",
+            "neuName": "CRITICAL"
+        },
+        "cubism": {
+            "maxLevel": "6",
+            "neuName": "CUBISM"
+        },
+        "cultivating": {
+            "maxLevel": "1",
+            "neuName": "CULTIVATING"
+        },
+        "delicate": {
+            "maxLevel": "5",
+            "neuName": "DELICATE"
+        },
+        "dragon_hunter": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "DRAGON_HUNTER"
+        },
+        "ender_slayer": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "ENDER_SLAYER"
+        },
+        "execute": {
+            "maxLevel": "6",
+            "neuName": "EXECUTE"
+        },
+        "ferocious_mana": {
+            "calculate": "true",
+            "maxLevel": "10",
+            "neuName": "FEROCIOUS_MANA"
+        },
+        "fire_protection": {
+            "maxLevel": "7",
+            "neuName": "FIRE_PROTECTION"
+        },
+        "first_strike": {
+            "maxLevel": "5",
+            "neuName": "FIRST_STRIKE"
+        },
+        "fortune": {
+            "maxLevel": "4",
+            "neuName": "FORTUNE"
+        },
+        "giant_killer": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "GIANT_KILLER"
+        },
+        "growth": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "GROWTH"
+        },
+        "hardened_mana": {
+            "calculate": "true",
+            "maxLevel": "10",
+            "neuName": "HARDENED_MANA"
+        },
+        "harvesting": {
+            "maxLevel": "6",
+            "neuName": "HARVESTING"
+        },
+        "hecatomb": {
+            "maxLevel": "1",
+            "neuName": "HECATOMB"
+        },
+        "life_steal": {
+            "maxLevel": "5",
+            "neuName": "LIFE_STEAL"
+        },
+        "looting": {
+            "maxLevel": "5",
+            "neuName": "LOOTING"
+        },
+        "luck": {
+            "maxLevel": "5",
+            "neuName": "LUCK"
+        },
+        "mana_steal": {
+            "calculate": "true",
+            "maxLevel": "3",
+            "neuName": "MANA_STEAL"
+        },
+        "mana_vampire": {
+            "calculate": "true",
+            "maxLevel": "10",
+            "neuName": "MANA_VAMPIRE"
+        },
+        "overload": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "OVERLOAD"
+        },
+        "power": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "POWER"
+        },
+        "pristine": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "PRISTINE"
+        },
+        "projectile_protection": {
+            "maxLevel": "7",
+            "neuName": "PROJECTILE_PROTECTION"
+        },
+        "prosecute": {
+            "maxLevel": "6",
+            "neuName": "PROSECUTE"
+        },
+        "protection": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "PROTECTION"
+        },
+        "rejuvenate": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "REJUVENATE"
+        },
+        "replenish": {
+            "maxLevel": "1",
+            "neuName": "REPLENISH"
+        },
+        "scavenger": {
+            "maxLevel": "5",
+            "neuName": "SCAVENGER"
+        },
+        "sharpness": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "SHARPNESS"
+        },
+        "smarty_pants": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "SMARTY_PANTS"
+        },
+        "smite": {
+            "maxLevel": "7",
+            "neuName": "SMITE"
+        },
+        "smoldering": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "SMOLDERING"
+        },
+        "snipe": {
+            "maxLevel": "4",
+            "neuName": "SNIPE"
+        },
+        "strong_mana": {
+            "calculate": "true",
+            "maxLevel": "10",
+            "neuName": "STRONG_MANA"
+        },
+        "sugar_rush": {
+            "calculate": "true",
+            "maxLevel": "3",
+            "neuName": "SUGAR_RUSH"
+        },
+        "syphon": {
+            "goodLevel": "4",
+            "maxLevel": "5",
+            "neuName": "SYPHON"
+        },
+        "tabasco": {
+            "maxLevel": "3",
+            "neuName": "TABASCO"
+        },
+        "thunderbolt": {
+            "maxLevel": "6",
+            "neuName": "THUNDERBOLT"
+        },
+        "thunderlord": {
+            "goodLevel": "6",
+            "maxLevel": "7",
+            "neuName": "THUNDERLORD"
+        },
+        "titan_killer": {
+            "maxLevel": "7",
+            "neuName": "TITAN_KILLER"
+        },
+        "triple_strike": {
+            "maxLevel": "5",
+            "neuName": "TRIPLE_STRIKE"
+        },
+        "true_protection": {
+            "maxLevel": "1",
+            "neuName": "TRUE_PROTECTION"
+        },
+        "turbo_cactus": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_CACTUS"
+        },
+        "turbo_cane": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_CANE"
+        },
+        "turbo_carrot": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_CARROT"
+        },
+        "turbo_coco": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_COCO"
+        },
+        "turbo_melon": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_MELON"
+        },
+        "turbo_mushrooms": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_MUSHROOMS"
+        },
+        "turbo_potato": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_POTATO"
+        },
+        "turbo_pumpkin": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_PUMPKIN"
+        },
+        "turbo_warts": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_WARTS"
+        },
+        "turbo_wheat": {
+            "calculate": "true",
+            "maxLevel": "5",
+            "neuName": "TURBO_WHEAT"
+        },
+        "vampirism": {
+            "maxLevel": "6",
+            "neuName": "VAMPIRISM"
+        },
+        "venomous": {
+            "maxLevel": "6",
+            "neuName": "VENOMOUS"
+        },
+        "vicious": {
+            "goodLevel": "3",
+            "maxLevel": "5",
+            "neuName": "VICIOUS"
+        }
+    },
+    "ULTIMATE": {
+        "ultimate_bank": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_BANK"
+        },
+        "ultimate_chimera": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_CHIMERA"
+        },
+        "ultimate_combo": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_COMBO"
+        },
+        "ultimate_reiterate": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_REITERATE"
+        },
+        "ultimate_fatal_tempo": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_FATAL_TEMPO"
+        },
+        "ultimate_habanero_tactics": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_HABANERO_TACTICS"
+        },
+        "ultimate_inferno": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_INFERNO"
+        },
+        "ultimate_jerry": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_JERRY"
+        },
+        "ultimate_last_stand": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_LAST_STAND"
+        },
+        "ultimate_legion": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_LEGION"
+        },
+        "ultimate_no_pain_no_gain": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_NO_PAIN_NO_GAIN"
+        },
+        "ultimate_one_for_all": {
+            "maxLevel": "1",
+            "neuName": "ULTIMATE_ONE_FOR_ALL"
+        },
+        "ultimate_rend": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_REND"
+        },
+        "ultimate_soul_eater": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_SOUL_EATER"
+        },
+        "ultimate_swarm": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_SWARM"
+        },
+        "ultimate_wisdom": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_WISDOM"
+        },
+        "ultimate_wise": {
+            "maxLevel": "5",
+            "neuName": "ULTIMATE_WISE"
+        }
+    },
+    "COSTS": {
+        "1": 1,
+        "2": 2,
+        "3": 4,
+        "4": 8,
+        "5": 16,
+        "6": 32,
+        "7": 64,
+        "8": 128,
+        "9": 256,
+        "10": 512
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "latestVersion": "1.0.3", 
+    "changelog": [
+        "Fixed some item text not being formatted correctly (underscores instead of spaces).", 
+        "Added a changelog for when the module is updated."
+    ]
+}
